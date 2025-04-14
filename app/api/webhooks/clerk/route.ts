@@ -635,14 +635,23 @@
 
 
 import { NextResponse } from 'next/server';
-console.log("⚡️ Clerk webhook hit!");
-export async function POST(req: Request) {
-  const body = await req.json();
-  console.log("✅ Incoming Clerk Webhook:", body);
 
-  return NextResponse.json({ success: true });
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    console.log("✅ Incoming Clerk Webhook:", body);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("❌ Error parsing Clerk webhook:", error);
+    return new NextResponse('Webhook failed', { status: 500 });
+  }
 }
 
+// This will show a message when visiting the URL in browser (GET)
 export async function GET() {
-  return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
+  return NextResponse.json({
+    message: "This endpoint only accepts POST requests from Clerk webhooks.",
+    hint: "Use Clerk to send a POST request to test the webhook.",
+  });
 }
