@@ -1,20 +1,39 @@
 // ====== USER PARAMS
+// export type CreateUserParams = {
+//   clerkId: string
+//   firstName: string
+//   lastName: string
+//   username: string
+//   email: string
+//   photo: string
+// }
+
+// export interface UpdateUserParams {
+//   username?: string
+//   firstName?: string
+//   lastName?: string
+//   photo?: string
+//   email?: string // <-- Add this line
+// }
+
+
+
 export type CreateUserParams = {
-  clerkId: string
-  firstName: string
-  lastName: string
-  username: string
-  email: string
-  photo: string
-}
+  clerkId: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  photo: string;
+};
 
-export type UpdateUserParams = {
-  firstName: string
-  lastName: string
-  username: string
-  photo: string
+export interface UpdateUserParams {
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  photo?: string;
+  email?: string;
 }
-
 // ====== EVENT PARAMS
 export type CreateEventParams = {
   userId: string
