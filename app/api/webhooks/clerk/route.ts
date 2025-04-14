@@ -635,24 +635,43 @@
 
 
 import { NextResponse } from 'next/server';
+import User from '@/lib/database/models/user.model';
+import { connectToDatabase } from '@/lib/database';
 
 export async function POST(req: Request) {
   try {
-    const rawBody = await req.text(); // This works on Vercel too
-    console.log("📦 Raw Webhook Body:", rawBody);
+    // Read and parse JSON body directly
+    const body = await req.json();
 
-    const body = JSON.parse(rawBody); // Try to parse it manually
-    console.log("✅ Parsed Webhook:", body);
+    console.log('📦 Incoming Webhook Body:', body);
 
-    return NextResponse.json({ success: true });
+    const { type, data } = body;
+
+    if (type === 'user.created') {
+      await connectToDatabase();
+
+      const existingUser = await User.findOne({ clerkId: data.id });
+      if (existingUser) {
+        console.log('👤 User already exists');
+        return NextResponse.json({ message: 'User already exists' });
+      }
+
+      const newUser = await User.create({
+        clerkId: data.id,
+        email: data.email_addresses[0].email_address,
+        username: data.username || data.id,
+        firstName: data.first_name || '',
+        lastName: data.last_name || '',
+        photo: data.image_url,
+      });
+
+      console.log('✅ New user created:', newUser);
+      return NextResponse.json({ message: 'User created' });
+    }
+
+    return NextResponse.json({ message: 'Unhandled event type' });
   } catch (error) {
-    console.error("❌ Error handling Clerk webhook:", error);
-    return new NextResponse("Webhook failed", { status: 500 });
+    console.error('❌ Webhook handler error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
-
-export async function GET() {
-  return NextResponse.json({
-    message: "Webhook is ready. Send POST request to test.",
-  });
 }
