@@ -638,16 +638,16 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const text = await req.text(); // Read raw body for debug
-    console.log("📦 Raw Body:", text);
+    const rawBody = await req.text(); // This works on Vercel too
+    console.log("📦 Raw Webhook Body:", rawBody);
 
-    const body = JSON.parse(text); // Safely parse
+    const body = JSON.parse(rawBody); // Try to parse it manually
     console.log("✅ Parsed Webhook:", body);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("❌ Error parsing webhook:", error);
-    return new NextResponse('Webhook failed', { status: 500 });
+    console.error("❌ Error handling Clerk webhook:", error);
+    return new NextResponse("Webhook failed", { status: 500 });
   }
 }
 
