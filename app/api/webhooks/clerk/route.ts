@@ -583,51 +583,66 @@
 
 // app/api/webhooks/clerk/route.ts
 
+// import { NextResponse } from 'next/server';
+// import { connectToDatabase } from '@/lib/database';
+// import User from '@/lib/database/models/user.model';
+
+// export async function POST(req: Request) {
+//   try {
+//     const body = await req.json();
+//     console.log("✅ Incoming Clerk Webhook:", body);
+
+//     if (body.type !== 'user.created') {
+//       return NextResponse.json({ message: 'Event ignored' });
+//     }
+
+//     const {
+//       id: clerkId,
+//       email_addresses,
+//       first_name,
+//       last_name,
+//       username,
+//       image_url,
+//     } = body.data;
+
+//     const email = email_addresses?.[0]?.email_address;
+//     if (!email) throw new Error("No email found in payload");
+
+//     await connectToDatabase();
+
+//     const existingUser = await User.findOne({ clerkId });
+//     if (!existingUser) {
+//       await User.create({
+//         clerkId,
+//         email,
+//         firstName: first_name || '',
+//         lastName: last_name || '',
+//         username: username || '',
+//         photo: image_url,
+//       });
+//       console.log("✅ New user saved to MongoDB.");
+//     } else {
+//       console.log("ℹ️ User already exists in MongoDB.");
+//     }
+
+//     return NextResponse.json({ success: true });
+//   } catch (error) {
+//     console.error("❌ Webhook error:", error);
+//     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+//   }
+// }
+
+
+
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/database';
-import User from '@/lib/database/models/user.model';
-
+console.log("⚡️ Clerk webhook hit!");
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    console.log("✅ Incoming Clerk Webhook:", body);
+  const body = await req.json();
+  console.log("✅ Incoming Clerk Webhook:", body);
 
-    if (body.type !== 'user.created') {
-      return NextResponse.json({ message: 'Event ignored' });
-    }
+  return NextResponse.json({ success: true });
+}
 
-    const {
-      id: clerkId,
-      email_addresses,
-      first_name,
-      last_name,
-      username,
-      image_url,
-    } = body.data;
-
-    const email = email_addresses?.[0]?.email_address;
-    if (!email) throw new Error("No email found in payload");
-
-    await connectToDatabase();
-
-    const existingUser = await User.findOne({ clerkId });
-    if (!existingUser) {
-      await User.create({
-        clerkId,
-        email,
-        firstName: first_name || '',
-        lastName: last_name || '',
-        username: username || '',
-        photo: image_url,
-      });
-      console.log("✅ New user saved to MongoDB.");
-    } else {
-      console.log("ℹ️ User already exists in MongoDB.");
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("❌ Webhook error:", error);
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
 }
