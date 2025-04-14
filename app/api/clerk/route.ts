@@ -636,23 +636,23 @@
 
 import { NextResponse } from 'next/server';
 
-export async function GET() {
-  console.log("📥 GET /api/webhooks/clerk called");
-  return NextResponse.json({
-    message: "This endpoint only accepts POST requests from Clerk webhooks.",
-    hint: "Use Clerk to send a POST request to test the webhook.",
-  });
-}
-
 export async function POST(req: Request) {
   try {
-    console.log("📥 POST /api/webhooks/clerk called");
-    const body = await req.json();
-    console.log("✅ Incoming Clerk Webhook:", body);
+    const text = await req.text(); // Read raw body for debug
+    console.log("📦 Raw Body:", text);
+
+    const body = JSON.parse(text); // Safely parse
+    console.log("✅ Parsed Webhook:", body);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("❌ Error parsing Clerk webhook:", error);
+    console.error("❌ Error parsing webhook:", error);
     return new NextResponse('Webhook failed', { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    message: "Webhook is ready. Send POST request to test.",
+  });
 }
